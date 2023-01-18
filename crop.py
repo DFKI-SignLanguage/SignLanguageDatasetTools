@@ -88,6 +88,7 @@ def cropAllVideos(pathFolder: str, cropLeft: int, cropRight: int, cropTop: int,
                 else:
                     subprocess.run(
                         ['copy', pathFile, OUTPUT_FOLDER_NAME + '/' + filename])
+        counter += 1
         print("DONE: " + str(counter))
 
 
@@ -131,12 +132,12 @@ if __name__ == "__main__":
 
     # test the percentage arguments on the range
     if (int(sys.argv[2]) + int(sys.argv[3]) >= 100 or
-            int(sys.argv[4]) + int(sys.argv[5]) >= 100 or
-            int(sys.argv[2]) >= 100 or int(sys.argv[3]) >= 100 or
-            int(sys.argv[4]) >= 100 or int(sys.argv[5]) >= 100 or
-            int(sys.argv[2]) < 0 or int(sys.argv[3]) < 0 or
-            int(sys.argv[4]) < 0 or int(sys.argv[5]) < 0
-        ):
+                int(sys.argv[4]) + int(sys.argv[5]) >= 100 or
+                int(sys.argv[2]) >= 100 or int(sys.argv[3]) >= 100 or
+                int(sys.argv[4]) >= 100 or int(sys.argv[5]) >= 100 or
+                int(sys.argv[2]) < 0 or int(sys.argv[3]) < 0 or
+                int(sys.argv[4]) < 0 or int(sys.argv[5]) < 0
+            ):
         print("\nThe sum of some percentages is >= 100 or some percentages are larger than 100!\n\n")
         print(helpText)
         sys.exit(0)
