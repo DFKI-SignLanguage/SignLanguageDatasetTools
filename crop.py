@@ -76,8 +76,8 @@ def cropAllVideos(pathFolder: str, cropLeft: int, cropRight: int, cropTop: int,
 
         # checking if it is a file
         if os.path.isfile(pathFile):
-            # if it is .mp4 crop the video
-            if (filename.endswith('.mp4')):
+            # if it is .mp4 or .webm crop the video
+            if (filename.endswith('.mp4') or filename.endswith('.webm')):
                 cropSingleVideo(filename, pathFile, cropLeft, cropRight,
                                 cropTop, cropBottom)
             # otherwise just copy it to the new folder
@@ -94,7 +94,7 @@ def cropAllVideos(pathFolder: str, cropLeft: int, cropRight: int, cropTop: int,
 if __name__ == "__main__":
     helpText = "Please use the script like this:\n\npython3 crop.py path/to/video/folder cropLeft cropRight cropTop cropBottom\n\n\
     Important:\n\
-        - Only .mp4 videos will be taken, all other files will be skipped\n\
+        - Only .mp4 or .webm videos will be taken, all other files will be skipped\n\
         - This script is only tested for Linux but should work on Windows as well if ffmpeg is installed\n\
         - cropXY must be an integer between 0 and 100\n\
         - the sum of cropLeft and cropRight must be < 100\n\
