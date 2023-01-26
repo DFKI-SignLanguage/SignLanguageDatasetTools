@@ -41,7 +41,10 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
         shutil.rmtree(p_t)
         os.mkdir(p_t)
     
-    os.mkdir(os.path.join(p_t , p_t+"_captions"))
+    os.mkdir(os.path.join(p_t , "captions"))
+    os.mkdir(os.path.join(p_t , "full_videos"))
+    os.mkdir(os.path.join(p_t , "cropped_videos"))
+    os.mkdir(os.path.join(p_t , "keypoints"))
     
     for url in p.video_urls:
         try:
@@ -86,7 +89,7 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                 #download the video
                 try:
                     stream = yt.streams.get_highest_resolution()
-                    yt.streams.get_highest_resolution().download(p_t,titel+".mp4")
+                    yt.streams.get_highest_resolution().download(os.path.join(p_t , "full_videos"),titel+".mp4")
                 except:
                     print(f'\nDownloading {url} is unavaialable, skipping.')
                   
@@ -110,7 +113,7 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                 data.append(str(url))
                 
                 # append Release Date
-                data.append(str(YouTube(url).publish_date.strftime("%x")))
+                data.append(str(YouTube(url).publish_date.strftime("%Y/%m/%d")))
                 
                 # append Resolution
                 data.append(str(stream.resolution))
@@ -144,13 +147,13 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                     data.append(str(l.count(".<")+l.count("?<")+l.count("!<")+l.count(". ")+l.count("? ")+l.count("! ")))
                  
                 # append Date of Acquisition
-                data.append(str(datetime.datetime.now().strftime("%x")))
+                data.append(str(datetime.datetime.now().strftime("%Y/%m/%d")))
                 
                 # append File size
                 data.append(str(stream.filesize)+"b")
                 
                 # append Video Path
-                data.append(p_t+"\\"+titel+".mp4")
+                data.append(Lang+"\\"+p_t+"\\"+"full_videos\\"+titel+".mp4")
     
     
     
@@ -167,7 +170,7 @@ data = []
 
 
 C_ID = input("\nType in the Channel ID from the GoogleSheet: ")
-Lang = input("\nType in the sign language: ")
+Lang = input("\nType in the sign language (SIL-code): ")
 dia = input("\nType in the sign language dialect: ")
 gran = input("\nType in the granularity (Sentences, Words or Phrases): ")
 
