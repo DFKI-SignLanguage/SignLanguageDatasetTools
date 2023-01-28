@@ -43,9 +43,9 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
         os.mkdir(p_t)
     
     os.mkdir(os.path.join(p_t , "captions"))
-    os.mkdir(os.path.join(p_t , "full_videos"))
-    os.mkdir(os.path.join(p_t , "cropped_videos"))
-    os.mkdir(os.path.join(p_t , "keypoints"))
+    os.mkdir(os.path.join(p_t , "videos"))
+    os.mkdir(os.path.join(p_t , "videos_uncropped"))
+    os.mkdir(os.path.join(p_t , "other"))
     
     for url in p.video_urls:
         try:
@@ -64,7 +64,7 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
             #download the video
             try:
                 stream = yt.streams.get_highest_resolution()
-                yt.streams.get_highest_resolution().download(os.path.join(p_t , "full_videos"),titel+".mp4")
+                yt.streams.get_highest_resolution().download(os.path.join(p_t , "videos_uncropped"),titel+".mp4")
             except:
                 print(f'\nDownloading {url} is unavaialable, skipping.')
              
@@ -77,13 +77,13 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                 elif(len(yt.captions) == 1):
                     lang_code = list(yt.captions.lang_code_index.keys())[0]
                     l = yt.captions[lang_code].xml_captions
-                    d = open(os.path.join(p_t, p_t+"_captions" , titel+"_"+lang_code+".xml"), "x", encoding="utf-8")
+                    d = open(os.path.join(p_t, "captions", titel+"_"+lang_code+".xml"), "x", encoding="utf-8")
                     d.write(l)
                     d.close
                 else:
                     try:
                         l = yt.captions[lang_code].xml_captions
-                        d = open(os.path.join(p_t, p_t+"_captions" , titel+"_"+lang_code+".xml"), "x", encoding="utf-8")
+                        d = open(os.path.join(p_t, "captions", titel+"_"+lang_code+".xml"), "x", encoding="utf-8")
                         d.write(l)
                         d.close
                     except:
@@ -119,14 +119,25 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
             data.append("tbd")
             
             # append Video Length
-            t = YouTube(url).length
-            data.append(str(time.strftime("%H:%M:%S", time.gmtime(t))))
+            i = 0
+            while(i < 3):
+                try:
+                    t = YouTube(url).length
+                    t_form = str(time.strftime("%H:%M:%S", time.gmtime(t)))
+                    i = 3
+                except Exception:
+                    t_form = "tbd"
+                i = i+1    
+            data.append(t_form)
             
             # append FPS
             data.append(str(stream.fps))
             
             # append Number of Frames
-            data.append(str(stream.fps*t))
+            if(t_form != "tbd"):
+                data.append(str(stream.fps*t))
+            else:
+                data.append("tbd")
             
             # append SL Subtitles Available -> not codable
             data.append("tbd")
@@ -137,7 +148,7 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
             # append Granularity -> not codable
             data.append(gran)
             
-            # append Number of sentences -> not codable
+            # append Number of sentences -> estimated
             if(l == ""):
                 data.append("tbd")
             else:
@@ -147,11 +158,10 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
             data.append(str(datetime.datetime.now().strftime("%Y/%m/%d")))
             
             # append File size
-            data.append(str(stream.filesize_mb)+"MB")
+            data.append(str(stream.filesize_mb)+" MB")
             
             # append Video Path
-            data.append(Lang+"\\"+p_t+"\\"+"full_videos\\"+titel+".mp4")
-    
+            data.append(Lang+"\\"+p_t+"\\"+"videos_uncropped\\"+titel+".mp4")
     
     
     
