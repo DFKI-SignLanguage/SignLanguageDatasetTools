@@ -33,7 +33,7 @@ def createnewtitle(direc,name):
         
 
 def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
-    data = data_
+    data = []
     try:
         p,p_t = geturl(cp, a)
         
@@ -172,14 +172,32 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                     
                     # append Video Path
                     data.append(Lang+"\\"+p_t+"\\"+"videos_uncropped\\"+titel+".mp4")
-        
+                    
         
         
         # write csv-file
         sv.writecsv( "new.csv", "|", titles, data)
         print("\nwrote csv-file")
     except Exception as e:
-        print("\nThe error raised is: ", e)
+        try:
+            # close possible open captionfile
+            d.close()
+        except:
+            pass
+        # delete data from video, where the error occured
+        rem_elem = len(data) % 19
+        if(rem_elem==0):
+            rem_elem = 19
+        for i in range(rem_elem):
+            if(len(data)>0):
+                data.pop(len(data)-1)
+            
+        try:
+            # remove files from the last url
+            os.remove(os.path.join(p_t , "videos_uncropped",titel+".mp4"))
+            os.remove(os.path.join(p_t, "captions", titel+"_"+lang_code+".xml"))
+        finally:
+            print("\nThe error raised is: ", e)
         # write csv-file
         sv.writecsv( "new.csv", "|", titles, data)
         print("\nwrote csv-file after error")
@@ -192,7 +210,6 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
 
 
 titles = ["Channel Id",	"Language",	"Dialect","Video Name","Part of Series","Url","Release Date","Resolution","Cropped","Video Length","FPS","Number of Frames","SL Subtitles Available","Audio Transcript Available","Granularity","Number of Sentences","Date of Acquisition","File Size","Video Path"]
-data_ = []
 
 
 C_ID = input("\nType in the Channel ID from the GoogleSheet: ")
