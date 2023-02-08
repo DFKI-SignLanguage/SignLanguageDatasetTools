@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[[source]]
+url = "https://mirror.baidu.com/pypi/simple"
+verify_ssl = true
+name = "mirrorbaidu"
+
+[packages]
+paddlepaddle = ">=2.3"
+paddleocr = ">=2.6"
+
+[dev-packages]
+
+[requires]
+python_version = "3.7"
