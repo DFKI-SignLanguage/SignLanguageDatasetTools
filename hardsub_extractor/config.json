@@ -1,0 +1,25 @@
+{	
+	"DIR_PATH": "/Users/taekwon.rhee/Documents/Uni/Q&U project/script/slt/scraping/Maria Ortiz (temp)/lowcut/cropped/test2",
+	"VIDEO_TYPE": ".mp4",
+
+	"language_code": "es",
+	"use_gpu": 0,
+
+	"start_time": "00:00",
+	"end_time": "",
+
+	"confidence_threshold": 75,
+	"similarity_threshold": 20,
+
+	"use_fullframe": 1,
+	"frames_to_skip": 5,
+
+	"crop_x": 0,
+	"crop_y": 0,
+	"crop_width": 0,
+	"crop_height": 0,
+
+	"similar_image_threshold": 100,
+	"similar_pixel_threshold": 25
+
+}
