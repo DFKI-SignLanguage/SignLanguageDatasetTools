@@ -10,9 +10,11 @@ import sv
 import os, shutil
 import datetime, time
 
+csv = "new.csv"
+
 
 def geturl(cp, a):
-    
+    # changing the name for the whole amount of videos
     if(cp == 'c'):
         c = Playlist(a)
         c_t = c.owner
@@ -23,6 +25,7 @@ def geturl(cp, a):
         return p,p_t
     
 def createnewtitle(direc,name):
+    # change the titel,if a video with the same title already exists
     if( os.path.exists(os.path.join(direc,name+".mp4")) == True):
         for i in range(6000):
             if( os.path.exists(os.path.join(direc,name+"_"+str(i)+".mp4")) == False): 
@@ -32,11 +35,12 @@ def createnewtitle(direc,name):
             
         
 
-def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
+def createdata(C_ID, Lang, dia, gran, a, lang_code_s, cp):
     data = []
     try:
         p,p_t = geturl(cp, a)
         
+        # create directory for the whole URL, if necessary
         if(os.path.exists(p_t) == False):
             os.mkdir(p_t)
         else:
@@ -45,7 +49,7 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                 shutil.rmtree(p_t)
                 os.mkdir(p_t)
                 
-        
+        # creating sub-directorys according the defined file-structure
         os.makedirs(os.path.join(p_t , "captions"), exist_ok = True)
         os.makedirs(os.path.join(p_t , "videos"), exist_ok = True)
         os.makedirs(os.path.join(p_t , "videos_uncropped"), exist_ok = True)
@@ -64,12 +68,16 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                             .replace("/", "").replace("\"", "").replace("?", "") \
                             .replace("*", "").replace(":", "").replace(">", "").replace("<", "")
                 
-                titel = createnewtitle(p_t,titel)
-                
-                vid = os.path.join(p_t , "videos_uncropped",titel+".mp4")
-                if(os.path.exists(vid) == True):
-                    print("Video is already downloaded.")
-                    continue
+                # check if video is already downloaded
+                try:
+                    o = open(csv,'r')
+                    data_now = o.read()
+                    o.close()
+                    if(data_now.find(url) != -1):
+                        print("Video is already downloaded.")
+                        continue
+                except:
+                    pass
                 
                 #download the video
                 try:
@@ -82,9 +90,11 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                     l = ""
                     lang_code = lang_code_s
                     while(l == ""):
+                        # skip, if there are no captions
                         if(lang_code == "" or len(yt.captions) == 0):
                             break
                         elif(len(yt.captions) == 1):
+                        # if only on language for captions is available, download this one
                             lang_code = list(yt.captions.lang_code_index.keys())[0]
                             l = yt.captions[lang_code].xml_captions
                             d = open(os.path.join(p_t, "captions", titel+"_"+lang_code+".xml"), "x", encoding="utf-8")
@@ -129,25 +139,14 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                     data.append("tbd")
                     
                     # append Video Length
-                    i = 0
-                    while(i < 3):
-                        try:
-                            t = YouTube(url).length
-                            t_form = str(time.strftime("%H:%M:%S", time.gmtime(t)))
-                            i = 3
-                        except Exception:
-                            t_form = "tbd"
-                        i = i+1    
-                    data.append(t_form)
+                    t = YouTube(url).length
+                    data.append(str(time.strftime("%H:%M:%S", time.gmtime(t))))
                     
                     # append FPS
                     data.append(str(stream.fps))
                     
                     # append Number of Frames
-                    if(t_form != "tbd"):
-                        data.append(str(stream.fps*t))
-                    else:
-                        data.append("tbd")
+                    data.append(str(stream.fps*t))
                     
                     # append SL Subtitles Available -> not codable
                     data.append("tbd")
@@ -168,15 +167,15 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
                     data.append(str(datetime.datetime.now().strftime("%Y/%m/%d")))
                     
                     # append File size
-                    data.append(str(stream.filesize_mb)+" MB")
+                    size = stream.filesize_mb
+                    data.append(str(size))
                     
                     # append Video Path
                     data.append(Lang+"\\"+p_t+"\\"+"videos_uncropped\\"+titel+".mp4")
                     
-        
-        
+                    
         # write csv-file
-        sv.writecsv( "new.csv", "|", titles, data)
+        sv.writecsv( csv, "|", titles, data)
         print("\nwrote csv-file")
     except Exception as e:
         try:
@@ -184,6 +183,7 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
             d.close()
         except:
             pass
+        
         # delete data from video, where the error occured
         rem_elem = len(data) % 19
         if(rem_elem==0):
@@ -198,8 +198,9 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
             os.remove(os.path.join(p_t, "captions", titel+"_"+lang_code+".xml"))
         finally:
             print("\nThe error raised is: ", e)
+            
         # write csv-file
-        sv.writecsv( "new.csv", "|", titles, data)
+        sv.writecsv( csv, "|", titles, data)
         print("\nwrote csv-file after error")
         rep = input("\nDo you want to repeat with the same data? (y/n) ")
         if(rep == "y"):
@@ -209,9 +210,9 @@ def createdata(C_ID, Lang, dia, gran, a, lang_code, cp):
 
 
 
-titles = ["Channel Id",	"Language",	"Dialect","Video Name","Part of Series","Url","Release Date","Resolution","Cropped","Video Length","FPS","Number of Frames","SL Subtitles Available","Audio Transcript Available","Granularity","Number of Sentences","Date of Acquisition","File Size","Video Path"]
+titles = ["Channel Id",	"Language",	"Dialect","Video Name","Part of Series","Url","Release Date","Resolution","Cropped","Video Length","FPS","Number of Frames","SL Subtitles Available","Audio Transcript Available","Granularity","Number of Sentences","Date of Acquisition","File Size in MB","Video Path"]
 
-
+# getting inputs
 C_ID = input("\nType in the Channel ID from the GoogleSheet: ")
 Lang = input("\nType in the sign language (SIL-code): ")
 dia = input("\nType in the sign language dialect: ")
